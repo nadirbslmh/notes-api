@@ -43,3 +43,21 @@ func (config *ConfigDB) InitDB() *gorm.DB {
 func DBMigrate(db *gorm.DB) {
 	db.AutoMigrate(&notes.Note{}, &categories.Category{})
 }
+
+func CloseDB(db *gorm.DB) error {
+	database, err := db.DB()
+
+	if err != nil {
+		log.Printf("error when getting the database instance: %v", err)
+		return err
+	}
+
+	if err := database.Close(); err != nil {
+		log.Printf("error when closing the database connection: %v", err)
+		return err
+	}
+
+	log.Println("database connection is closed")
+
+	return nil
+}
