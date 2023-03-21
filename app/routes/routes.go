@@ -19,7 +19,7 @@ func (cl *ControllerList) RegisterRoutes(e *echo.Echo) {
 	note.GET("", cl.NoteController.GetAllNotes)
 	note.GET("/:id", cl.NoteController.GetNoteByID)
 	note.POST("", cl.NoteController.CreateNote)
-	note.PUT("/:id", cl.NoteController.UpdateNote)
+	note.PATCH("/:id", cl.NoteController.UpdateNote)
 	note.DELETE("/:id", cl.NoteController.DeleteNote)
 	note.POST("/:id", cl.NoteController.RestoreNote)
 	note.DELETE("/force/:id", cl.NoteController.ForceDeleteNote)
@@ -28,6 +28,6 @@ func (cl *ControllerList) RegisterRoutes(e *echo.Echo) {
 
 	category.GET("", cl.CategoryController.GetAllCategories)
 	category.POST("", cl.CategoryController.CreateCategory)
-	category.PUT("/:id", cl.CategoryController.UpdateCategory)
+	category.PATCH("/:id", cl.CategoryController.UpdateCategory)
 	category.DELETE("/:id", cl.CategoryController.DeleteCategory)
 }
