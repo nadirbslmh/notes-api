@@ -26,6 +26,13 @@ CREATE DATABASE notes_api;
 go run main.go
 ```
 
+## Additional Notes
+
+There are two branches in this repository:
+
+- `with-db`: Includes clean architecture implementation with Database. Authentication feature is not provided.
+- `main`: Will includes clean architecture complete implementation.
+
 ## Resources
 
 - [Graceful Shutdown Implementation](https://medium.com/tokopedia-engineering/gracefully-shutdown-your-go-application-9e7d5c73b5ac).
