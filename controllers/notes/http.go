@@ -75,7 +75,6 @@ func (ctrl *NoteController) CreateNote(c echo.Context) error {
 	return controllers.NewResponse(c, http.StatusCreated, "success", "note created", response.FromDomain(note))
 }
 
-// TODO: start from this and the rest, copy to ppt
 func (ctrl *NoteController) UpdateNote(c echo.Context) error {
 	input := request.Note{}
 	ctx := c.Request().Context()
