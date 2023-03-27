@@ -1,6 +1,7 @@
 package middlewares
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -16,19 +17,19 @@ type JwtCustomClaims struct {
 	jwt.RegisteredClaims
 }
 
-type ConfigJWT struct {
+type JWTConfig struct {
 	SecretJWT       string
 	ExpiresDuration int
 }
 
-func (jwtConf *ConfigJWT) Init() middleware.JWTConfig {
+func (jwtConf *JWTConfig) Init() middleware.JWTConfig {
 	return middleware.JWTConfig{
 		Claims:     &JwtCustomClaims{},
 		SigningKey: []byte(jwtConf.SecretJWT),
 	}
 }
 
-func (jwtConf *ConfigJWT) GenerateToken(userID int) string {
+func (jwtConf *JWTConfig) GenerateToken(userID int) (string, error) {
 	expire := jwt.NewNumericDate(time.Now().Local().Add(time.Hour * time.Duration(int64(jwtConf.ExpiresDuration))))
 
 	claims := &JwtCustomClaims{
@@ -40,31 +41,38 @@ func (jwtConf *ConfigJWT) GenerateToken(userID int) string {
 
 	// Create token with claims
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	token, _ := t.SignedString([]byte(jwtConf.SecretJWT))
+	token, err := t.SignedString([]byte(jwtConf.SecretJWT))
+
+	if err != nil {
+		return "", err
+	}
 
 	whitelist = append(whitelist, token)
 
-	return token
+	return token, nil
 }
 
-func GetUser(c echo.Context) *JwtCustomClaims {
+func GetUser(c echo.Context) (*JwtCustomClaims, error) {
 	user := c.Get("user").(*jwt.Token)
 
 	isListed := CheckToken(user.Raw)
 
 	if !isListed {
-		return nil
+		return nil, errors.New("invalid token")
 	}
 
 	claims := user.Claims.(*JwtCustomClaims)
-	return claims
+
+	return claims, nil
 }
 
 func VerifyToken(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		userID := GetUser(c)
+		userID, err := GetUser(c)
 
-		if userID == nil {
+		isInvalid := userID == nil || err != nil
+
+		if isInvalid {
 			return c.JSON(http.StatusUnauthorized, map[string]string{
 				"message": "invalid token",
 			})
