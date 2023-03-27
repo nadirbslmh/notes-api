@@ -17,11 +17,11 @@ type Domain struct {
 }
 
 type Usecase interface {
-	Register(ctx context.Context, userDomain *Domain) Domain
-	Login(ctx context.Context, userDomain *Domain) string
+	Register(ctx context.Context, userDomain *Domain) (Domain, error)
+	Login(ctx context.Context, userDomain *Domain) (string, error)
 }
 
 type Repository interface {
-	Register(ctx context.Context, userDomain *Domain) Domain
-	GetByEmail(ctx context.Context, userDomain *Domain) Domain
+	Register(ctx context.Context, userDomain *Domain) (Domain, error)
+	GetByEmail(ctx context.Context, userDomain *Domain) (Domain, error)
 }
