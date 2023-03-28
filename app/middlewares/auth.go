@@ -92,12 +92,36 @@ func CheckToken(token string) bool {
 	return false
 }
 
-func Logout(token string) bool {
+func RemoveToken(token string) bool {
+	var isFound bool = false
 	for idx, tkn := range whitelist {
 		if tkn == token {
 			whitelist = append(whitelist[:idx], whitelist[idx+1:]...)
+			isFound = true
 		}
 	}
 
+	if !isFound {
+		return isFound
+	}
+
 	return true
+}
+
+func Logout(c echo.Context) (bool, error) {
+	user := c.Get("user").(*jwt.Token)
+
+	isListed := CheckToken(user.Raw)
+
+	if !isListed {
+		return false, errors.New("invalid token")
+	}
+
+	isRemoved := RemoveToken(user.Raw)
+
+	if !isRemoved {
+		return false, errors.New("invalid token")
+	}
+
+	return true, nil
 }
