@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v4"
+	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 var whitelist []string = make([]string, 5)
@@ -22,9 +22,11 @@ type JWTConfig struct {
 	ExpiresDuration int
 }
 
-func (jwtConf *JWTConfig) Init() middleware.JWTConfig {
-	return middleware.JWTConfig{
-		Claims:     &JwtCustomClaims{},
+func (jwtConf *JWTConfig) Init() echojwt.Config {
+	return echojwt.Config{
+		NewClaimsFunc: func(c echo.Context) jwt.Claims {
+			return new(JwtCustomClaims)
+		},
 		SigningKey: []byte(jwtConf.SecretJWT),
 	}
 }
