@@ -18,8 +18,12 @@ import (
 	_categoryUseCase "notes-api/businesses/categories"
 	_categoryController "notes-api/controllers/categories"
 
+	_userUseCase "notes-api/businesses/users"
+	_userController "notes-api/controllers/users"
+
 	_dbDriver "notes-api/drivers/mysql"
 
+	_middleware "notes-api/app/middlewares"
 	_routes "notes-api/app/routes"
 
 	echo "github.com/labstack/echo/v4"
@@ -40,6 +44,15 @@ func main() {
 
 	_dbDriver.DBMigrate(db)
 
+	configJWT := _middleware.JWTConfig{
+		SecretJWT:       utils.GetConfig("JWT_SECRET_KEY"),
+		ExpiresDuration: 1,
+	}
+
+	configLogger := _middleware.LoggerConfig{
+		Format: "[${time_rfc3339}] ${status} ${method} ${host} ${path} ${latency_human}" + "\n",
+	}
+
 	e := echo.New()
 
 	categoryRepo := _driverFactory.NewCategoryRepository(db)
@@ -50,9 +63,16 @@ func main() {
 	noteUsecase := _noteUseCase.NewNoteUsecase(noteRepo)
 	noteCtrl := _noteController.NewNoteController(noteUsecase)
 
+	userRepo := _driverFactory.NewUserRepository(db)
+	userUsecase := _userUseCase.NewUserUseCase(userRepo, &configJWT)
+	userCtrl := _userController.NewAuthController(userUsecase)
+
 	routesInit := _routes.ControllerList{
+		LoggerMiddleware:   configLogger.Init(),
+		JWTMiddleware:      configJWT.Init(),
 		CategoryController: *categoryCtrl,
 		NoteController:     *noteCtrl,
+		AuthController:     *userCtrl,
 	}
 
 	routesInit.RegisterRoutes(e)

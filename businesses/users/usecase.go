@@ -10,9 +10,10 @@ type userUsecase struct {
 	jwtAuth        *middlewares.JWTConfig
 }
 
-func NewUserUseCase(ur Repository) Usecase {
+func NewUserUseCase(ur Repository, jwtAuth *middlewares.JWTConfig) Usecase {
 	return &userUsecase{
 		userRepository: ur,
+		jwtAuth:        jwtAuth,
 	}
 }
 

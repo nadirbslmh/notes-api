@@ -5,6 +5,7 @@ import (
 	"log"
 	"notes-api/drivers/mysql/categories"
 	"notes-api/drivers/mysql/notes"
+	"notes-api/drivers/mysql/users"
 
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -41,7 +42,7 @@ func (config *ConfigDB) InitDB() *gorm.DB {
 }
 
 func DBMigrate(db *gorm.DB) {
-	db.AutoMigrate(&notes.Note{}, &categories.Category{})
+	db.AutoMigrate(&notes.Note{}, &categories.Category{}, &users.User{})
 }
 
 func CloseDB(db *gorm.DB) error {
